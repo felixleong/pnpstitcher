@@ -1,0 +1,2 @@
+class StitcherError(BaseException):
+    pass
