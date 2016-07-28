@@ -49,10 +49,15 @@ class BaseGenerator(object):
                     self._draw_cutlines(cutline_config)
 
             # Draw the image
-            x_pos = (
-                self._cut_margin_x + x_cnt * image_catalog.image_size[0])
+            if rtl:
+                x_pos = (
+                    self.page_width - self._cut_margin_x -
+                    ((x_cnt + 1) * image_catalog.image_size[0]))
+            else:
+                x_pos = (
+                    self._cut_margin_x + (x_cnt * image_catalog.image_size[0]))
             y_pos = (
-                self._cut_margin_y + y_cnt * image_catalog.image_size[1])
+                self._cut_margin_y + (y_cnt * image_catalog.image_size[1]))
             self._draw_image(pil_image, x_pos, y_pos, image_catalog.image_size)
 
             # Switch to next row when it is happening
