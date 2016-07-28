@@ -2,7 +2,7 @@ from PIL import Image
 from pnpstitcher.exception import StitcherError
 
 
-class ImageSet(object):
+class ImageCatalog(object):
     def __init__(self, filename_set):
         self.image_set = [
             Image.open(filename)

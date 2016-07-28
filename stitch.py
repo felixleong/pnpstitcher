@@ -8,7 +8,7 @@ Options:
 """
 from docopt import docopt
 from pint import UnitRegistry
-from pnpstitcher.image import ImageSet
+from pnpstitcher.image import ImageCatalog
 from pnpstitcher.generator import PdfGenerator
 
 
@@ -27,5 +27,7 @@ if __name__ == '__main__':
     page_height = round(Q_('297mm').m_as('in') * dpi)
 
     # Handle the files now
-    image_set = ImageSet(filename_set)
-    output_file = PdfGenerator(output_fn, page_width, page_height, dpi)
+    image_catalog = ImageCatalog(filename_set)
+    output_generator = PdfGenerator(
+        output_fn, page_width, page_height, dpi=dpi)
+    output_generator.generate(image_catalog)
