@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from collections import namedtuple
 
 
@@ -5,6 +6,8 @@ CutLine = namedtuple('CutLine', ['x0', 'y0', 'x1', 'y1'])
 
 
 class BaseGenerator(object):
+    __metaclass__ = ABCMeta
+
     def __init__(
             self, filename, page_width, page_height, page_margin_x=0,
             page_margin_y=0, dpi=300):

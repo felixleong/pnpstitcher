@@ -8,6 +8,7 @@ Options:
     -c FILENAME --config=FILENAME       Name of the config file.
     -r --rtl                            Layout the cards from right-to-left for
                                         duplex printing.
+    <files>                             The PNG files to be stitched together.
 """
 from docopt import docopt
 from pnpstitcher.config.parser import load_config
