@@ -29,11 +29,12 @@ class PdfGenerator(BaseGenerator):
         self._context = cairo.Context(self._pdf)
         self._context.scale(dpi_to_pp, dpi_to_pp)
 
-    def _render(self, image_catalog):
+    def _render(self, image_catalog, cutline_config):
         """
         Render the images on pages.
 
         :param ImageCatalog image_catalog: The loaded image database.
+        :param dict cutline_config: The cutline configuration.
         """
         x_cnt = 0
         y_cnt = 0
@@ -42,8 +43,10 @@ class PdfGenerator(BaseGenerator):
 
         for pil_image in image_catalog.image_set:
             # Draw cut lines if it's a fresh page
-            if x_cnt == 0 and y_cnt == 0:
-                self._draw_cutlines()
+            if (
+                    cutline_config['layer'] == 'bottom' and
+                    x_cnt == 0 and y_cnt == 0):
+                self._draw_cutlines(cutline_config)
 
             # Draw the image
             x_pos = (
@@ -64,19 +67,28 @@ class PdfGenerator(BaseGenerator):
             if y_cnt >= self._card_num_y:
                 x_cnt = 0
                 y_cnt = 0
+                if cutline_config['layer'] == 'top':
+                    self._draw_cutlines(cutline_config)
                 self._pdf.show_page()
 
+        # After we hit the last page and if there's some left-over that is not
+        # rendered, we should do it now.
         if x_cnt != 0 or y_cnt != 0:
+            if cutline_config['layer'] == 'top':
+                self._draw_cutlines(cutline_config)
             self._pdf.show_page()
 
-    def _draw_cutlines(self):
+    def _draw_cutlines(self, cutline_config):
         """
         Draw cutlines.
+
+        :param dict cutline_config: The cutline configuration.
         """
         # Set the style
-        self._context.set_source_rgba(0.6, 0.6, 0.6, 1)
-        self._context.set_line_width(1)
-        self._context.set_dash((30, 15), 0)
+        self._context.set_source_rgba(*cutline_config['color'])
+        self._context.set_line_width(cutline_config['width'])
+        if cutline_config['dashed']:
+            self._context.set_dash((7.5, 7.5), 0)
 
         # Draw lines
         for line in self._cutline_set:

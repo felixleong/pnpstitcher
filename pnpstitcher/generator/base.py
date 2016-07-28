@@ -24,29 +24,31 @@ class BaseGenerator(object):
         self.page_margin_y = page_margin_y
         self.dpi = dpi
 
-    def generate(self, image_catalog, trim_offset=0):
+    def generate(self, image_catalog, cutline_config):
         """
         Generate the output file.
 
         :param ImageCatalog image_catalog: The loaded image database.
-        :param int trim_offset: The trim offset in pixels.
+        :param dict cutline_config: The cutline configuration.
         """
-        self._generate_cut_line(image_catalog.image_size, trim_offset)
-        self._render(image_catalog)
+        self._generate_cut_line(
+            image_catalog.image_size, cutline_config['trim_offset'])
+        self._render(image_catalog, cutline_config)
 
-    def _render(self, image_set):
+    def _render(self, image_set, cutline_config):
         """
         Render the images on pages.
 
         :param ImageSet image_set: The loaded image database.
+        :param dict cutline_config: The cutline configuration.
         """
         raise NotImplemented()
 
-    def _draw_cutlines(self):
+    def _draw_cutlines(self, cutline_config):
         """
         Draw cutlines.
 
-        :param list cutline_set: The list of the cutlines.
+        :param dict cutline_config: The cutline configuration.
         """
         raise NotImplemented()
 
@@ -63,12 +65,12 @@ class BaseGenerator(object):
             (self.page_width - self.page_margin_x * 2), image_dimension[0])
         self._card_num_y, self._cut_margin_y = divmod(
             (self.page_height - self.page_margin_y * 2), image_dimension[1])
-        self._cut_margin_x = self._cut_margin_x / 2
-        self._cut_margin_y = self._cut_margin_y / 2
+        self._cut_margin_x = self._cut_margin_x / 2 + self.page_margin_x
+        self._cut_margin_y = self._cut_margin_y / 2 + self.page_margin_y
 
         # Generate the vertical cutlines
         cutline_set = []
-        prev_x = self._cut_margin_x + self.page_margin_x
+        prev_x = self._cut_margin_x
         if not trim_offset:
             # If it's a clean cut, we need to draw the left-most cut line
             cutline_set.append(CutLine(prev_x, 0, prev_x, self.page_height))
@@ -89,7 +91,7 @@ class BaseGenerator(object):
             prev_x = next_x
 
         # Generate the horizontal cutlines
-        prev_y = self._cut_margin_y + self.page_margin_y
+        prev_y = self._cut_margin_y
         if not trim_offset:
             # If it's a clean cut, we need to draw the top-most cut line
             cutline_set.append(CutLine(0, prev_y, self.page_width, prev_y))
