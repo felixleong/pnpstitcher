@@ -29,54 +29,31 @@ class PdfGenerator(BaseGenerator):
         self._context = cairo.Context(self._pdf)
         self._context.scale(dpi_to_pp, dpi_to_pp)
 
-    def _render(self, image_catalog, cutline_config):
+    def _draw_image(self, pil_image, x_pos, y_pos, image_dimension):
         """
-        Render the images on pages.
+        Draw image onto page.
 
-        :param ImageCatalog image_catalog: The loaded image database.
-        :param dict cutline_config: The cutline configuration.
+        :param Image pil_image: The image.
+        :param int x_pos: The x position in pixel.
+        :param int y_pos: The y position in pixel.
+        :param list image_dimension: A 2-tuple containing the image width and
+            height.
         """
-        x_cnt = 0
-        y_cnt = 0
-        x_pos = 0
-        y_pos = 0
+        image = cairo.ImageSurface.create_from_png(pil_image.fp.name)
+        self._context.set_source_surface(image, x_pos, y_pos)
+        self._context.paint()
 
-        for pil_image in image_catalog.image_set:
-            # Draw cut lines if it's a fresh page
-            if (
-                    cutline_config['layer'] == 'bottom' and
-                    x_cnt == 0 and y_cnt == 0):
-                self._draw_cutlines(cutline_config)
+    def _initialize_page(self):
+        """
+        Start a fresh page.
+        """
+        return
 
-            # Draw the image
-            x_pos = (
-                self._cut_margin_x + x_cnt * image_catalog.image_size[0])
-            y_pos = (
-                self._cut_margin_y + y_cnt * image_catalog.image_size[1])
-            image = cairo.ImageSurface.create_from_png(pil_image.fp.name)
-            self._context.set_source_surface(image, x_pos, y_pos)
-            self._context.paint()
-
-            # Switch to next row when it is happening
-            x_cnt = x_cnt + 1
-            if x_cnt >= self._card_num_x:
-                x_cnt = 0
-                y_cnt = y_cnt + 1
-
-            # If we got past the page threshold, we would need to cease it
-            if y_cnt >= self._card_num_y:
-                x_cnt = 0
-                y_cnt = 0
-                if cutline_config['layer'] == 'top':
-                    self._draw_cutlines(cutline_config)
-                self._pdf.show_page()
-
-        # After we hit the last page and if there's some left-over that is not
-        # rendered, we should do it now.
-        if x_cnt != 0 or y_cnt != 0:
-            if cutline_config['layer'] == 'top':
-                self._draw_cutlines(cutline_config)
-            self._pdf.show_page()
+    def _render_page(self):
+        """
+        Render page.
+        """
+        self._pdf.show_page()
 
     def _draw_cutlines(self, cutline_config):
         """

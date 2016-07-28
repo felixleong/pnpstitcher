@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from collections import namedtuple
 
 
@@ -5,6 +6,8 @@ CutLine = namedtuple('CutLine', ['x0', 'y0', 'x1', 'y1'])
 
 
 class BaseGenerator(object):
+    __metaclass__ = ABCMeta
+
     def __init__(
             self, filename, page_width, page_height, page_margin_x=0,
             page_margin_y=0, dpi=300):
@@ -24,23 +27,84 @@ class BaseGenerator(object):
         self.page_margin_y = page_margin_y
         self.dpi = dpi
 
-    def generate(self, image_catalog, cutline_config):
+    def generate(self, image_catalog, cutline_config, rtl=False):
         """
         Generate the output file.
 
         :param ImageCatalog image_catalog: The loaded image database.
         :param dict cutline_config: The cutline configuration.
+        :param bool rtl: Layout the images from right-to-left.
         """
         self._generate_cut_line(
             image_catalog.image_size, cutline_config['trim_offset'])
-        self._render(image_catalog, cutline_config)
 
-    def _render(self, image_set, cutline_config):
+        # Start the rendering
+        x_cnt = 0
+        y_cnt = 0
+        x_pos = 0
+        y_pos = 0
+
+        for pil_image in image_catalog.image_set:
+            # Draw cut lines if it's a fresh page
+            if x_cnt == 0 and y_cnt == 0:
+                self._initialize_page()
+                if cutline_config['layer'] == 'bottom':
+                    self._draw_cutlines(cutline_config)
+
+            # Draw the image
+            if rtl:
+                x_pos = (
+                    self.page_width - self._cut_margin_x -
+                    ((x_cnt + 1) * image_catalog.image_size[0]))
+            else:
+                x_pos = (
+                    self._cut_margin_x + (x_cnt * image_catalog.image_size[0]))
+            y_pos = (
+                self._cut_margin_y + (y_cnt * image_catalog.image_size[1]))
+            self._draw_image(pil_image, x_pos, y_pos, image_catalog.image_size)
+
+            # Switch to next row when it is happening
+            x_cnt = x_cnt + 1
+            if x_cnt >= self._card_num_x:
+                x_cnt = 0
+                y_cnt = y_cnt + 1
+
+            # If we got past the page threshold, we would need to cease it
+            if y_cnt >= self._card_num_y:
+                x_cnt = 0
+                y_cnt = 0
+                if cutline_config['layer'] == 'top':
+                    self._draw_cutlines(cutline_config)
+                self._render_page()
+
+        # After we hit the last page and if there's some left-over that is not
+        # rendered, we should do it now.
+        if x_cnt != 0 or y_cnt != 0:
+            if cutline_config['layer'] == 'top':
+                self._draw_cutlines(cutline_config)
+            self._render_page()
+
+    def _initialize_page(self):
         """
-        Render the images on pages.
+        Start a fresh page.
+        """
+        raise NotImplemented()
 
-        :param ImageSet image_set: The loaded image database.
-        :param dict cutline_config: The cutline configuration.
+    def _render_page(self):
+        """
+        Render page.
+        """
+        raise NotImplemented()
+
+    def _draw_image(self, image, x_pos, y_pos, image_dimension):
+        """
+        Draw image onto page.
+
+        :param Image image: The image.
+        :param int x_pos: The x position in pixel.
+        :param int y_pos: The y position in pixel.
+        :param list image_dimension: A 2-tuple containing the image width and
+            height.
         """
         raise NotImplemented()
 
