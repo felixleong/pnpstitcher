@@ -47,9 +47,9 @@ class PdfGenerator(BaseGenerator):
 
             # Draw the image
             x_pos = (
-                self._cut_margin_x + x_cnt * image_catalog.image_size[0] - 1)
+                self._cut_margin_x + x_cnt * image_catalog.image_size[0])
             y_pos = (
-                self._cut_margin_y + y_cnt * image_catalog.image_size[1] - 1)
+                self._cut_margin_y + y_cnt * image_catalog.image_size[1])
             image = cairo.ImageSurface.create_from_png(pil_image.fp.name)
             self._context.set_source_surface(image, x_pos, y_pos)
             self._context.paint()
