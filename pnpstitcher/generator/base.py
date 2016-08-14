@@ -10,7 +10,7 @@ class BaseGenerator(object):
 
     def __init__(
             self, filename, page_width, page_height, page_margin_x=0,
-            page_margin_y=0, dpi=300):
+            page_margin_y=0, image_dpi=300, page_dpi=96):
         """
         :param str filename: The filename of the output PDF file.
         :param int page_width: Page width in pixel.
@@ -19,13 +19,16 @@ class BaseGenerator(object):
                                   (both sides).
         :param int page_margin_y: The paper margin on the y-axis in pixels
                                   (both sides).
-        :param int dpi: The dpi.
+        :param int image_dpi: The image dpi.
+        :param int page_dpi: The page dpi.
         """
         self.page_width = page_width
         self.page_height = page_height
         self.page_margin_x = page_margin_x
         self.page_margin_y = page_margin_y
-        self.dpi = dpi
+        self.image_dpi = image_dpi
+        self.page_dpi = page_dpi
+        self.image_scale = self.page_dpi / self.image_dpi
 
     def generate(self, image_catalog, cutline_config, rtl=False):
         """
@@ -39,6 +42,8 @@ class BaseGenerator(object):
             image_catalog.image_size, cutline_config['trim_offset'])
 
         # Start the rendering
+        image_width = image_catalog.image_size[0] / self.image_dpi
+        image_height = image_catalog.image_size[1] / self.image_dpi
         x_cnt = 0
         y_cnt = 0
         x_pos = 0
@@ -55,13 +60,12 @@ class BaseGenerator(object):
             if rtl:
                 x_pos = (
                     self.page_width - self._cut_margin_x -
-                    ((x_cnt + 1) * image_catalog.image_size[0]))
+                    ((x_cnt + 1) * image_width))
             else:
-                x_pos = (
-                    self._cut_margin_x + (x_cnt * image_catalog.image_size[0]))
-            y_pos = (
-                self._cut_margin_y + (y_cnt * image_catalog.image_size[1]))
-            self._draw_image(pil_image, x_pos, y_pos, image_catalog.image_size)
+                x_pos = self._cut_margin_x + (x_cnt * image_width)
+            y_pos = self._cut_margin_y + (y_cnt * image_height)
+            self._draw_image(
+                pil_image, x_pos, y_pos, (image_width, image_height))
 
             # Switch to next row when it is happening
             x_cnt = x_cnt + 1
@@ -125,12 +129,19 @@ class BaseGenerator(object):
         :param int trim_offset: The trim offset in pixels.
         :returns: The metadata of the page.
         """
+        image_width = image_dimension[0] / self.image_dpi
+        image_height = image_dimension[1] / self.image_dpi
         self._card_num_x, self._cut_margin_x = divmod(
-            (self.page_width - self.page_margin_x * 2), image_dimension[0])
+            round(self.page_width - self.page_margin_x * 2), image_width)
         self._card_num_y, self._cut_margin_y = divmod(
-            (self.page_height - self.page_margin_y * 2), image_dimension[1])
+            round(self.page_height - self.page_margin_y * 2), image_height)
+        self._card_num_x = int(self._card_num_x)
+        self._card_num_y = int(self._card_num_y)
         self._cut_margin_x = self._cut_margin_x / 2 + self.page_margin_x
         self._cut_margin_y = self._cut_margin_y / 2 + self.page_margin_y
+
+        if self._card_num_x == 0 or self._card_num_y == 0:
+            raise RuntimeError('Image too large for the page')
 
         # Generate the vertical cutlines
         cutline_set = []
@@ -140,7 +151,7 @@ class BaseGenerator(object):
             cutline_set.append(CutLine(prev_x, 0, prev_x, self.page_height))
 
         for cnt in range(self._card_num_x):
-            next_x = prev_x + image_dimension[0]
+            next_x = prev_x + image_width
             if trim_offset:
                 left_cut = prev_x + trim_offset
                 right_cut = next_x - trim_offset
@@ -161,7 +172,7 @@ class BaseGenerator(object):
             cutline_set.append(CutLine(0, prev_y, self.page_width, prev_y))
 
         for cnt in range(self._card_num_y):
-            next_y = prev_y + image_dimension[1]
+            next_y = prev_y + image_height
             if trim_offset:
                 top_cut = prev_y + trim_offset
                 bottom_cut = next_y - trim_offset

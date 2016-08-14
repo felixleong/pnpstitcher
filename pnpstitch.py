@@ -31,5 +31,5 @@ if __name__ == '__main__':
     output_generator = PdfGenerator(
         output_fn, config['page']['width'], config['page']['height'],
         config['page']['margin_x'], config['page']['margin_y'],
-        config['page']['dpi'])
+        config['page']['dpi'], 72)
     output_generator.generate(image_catalog, config['cutline'], rtl)
