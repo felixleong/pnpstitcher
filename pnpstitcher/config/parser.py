@@ -37,7 +37,7 @@ def __normalize(config):
     ureg = UnitRegistry()
     Q_ = ureg.Quantity
 
-    # Convert all the page related parameter to pixels
+    # Convert all the page related parameter to inches
     dpi = int(config['page']['dpi'])
     config['page']['dpi'] = dpi
     config['page']['width'] = Q_(config['page']['width']).m_as('in')
@@ -46,7 +46,7 @@ def __normalize(config):
     config['page']['margin_y'] = Q_(config['page']['margin_y']).m_as('in')
 
     # Convert the cutline configuration
-    config['cutline']['color'] = parse_color(config['cutline']['color'])
+    config['cutline']['color_float'] = parse_color(config['cutline']['color'])
     config['cutline']['width'] = float(config['cutline']['width'])
     config['cutline']['dashed'] = config['cutline']['dashed'] == 'true'
     config['cutline']['trim_offset'] = (

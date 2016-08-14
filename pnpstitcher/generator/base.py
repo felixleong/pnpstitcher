@@ -13,15 +13,16 @@ class BaseGenerator(object):
             page_margin_y=0, image_dpi=300, page_dpi=96):
         """
         :param str filename: The filename of the output PDF file.
-        :param int page_width: Page width in pixel.
-        :param int page_height: Page height in pixel.
-        :param int page_margin_x: The paper margin on the x-axis in pixels
+        :param int page_width: Page width in inches.
+        :param int page_height: Page height in inches.
+        :param int page_margin_x: The paper margin on the x-axis in inches
                                   (both sides).
-        :param int page_margin_y: The paper margin on the y-axis in pixels
+        :param int page_margin_y: The paper margin on the y-axis in inches
                                   (both sides).
         :param int image_dpi: The image dpi.
         :param int page_dpi: The page dpi.
         """
+        self.filename = filename
         self.page_width = page_width
         self.page_height = page_height
         self.page_margin_x = page_margin_x
@@ -105,8 +106,8 @@ class BaseGenerator(object):
         Draw image onto page.
 
         :param Image image: The image.
-        :param int x_pos: The x position in pixel.
-        :param int y_pos: The y position in pixel.
+        :param int x_pos: The x position in inches.
+        :param int y_pos: The y position in inches.
         :param list image_dimension: A 2-tuple containing the image width and
             height.
         """
@@ -125,8 +126,8 @@ class BaseGenerator(object):
         Generate the page frame meta.
 
         :param tuple image_dimension: A 2-tuple containing the width and height
-            of the card images in pixels.
-        :param int trim_offset: The trim offset in pixels.
+            of the card images in inches.
+        :param int trim_offset: The trim offset in inches.
         :returns: The metadata of the page.
         """
         image_width = image_dimension[0] / self.image_dpi
