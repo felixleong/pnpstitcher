@@ -1,9 +1,10 @@
-Pillow==3.3.0
-Pint==0.7.2
 cairocffi==0.7.2
 cffi==1.7.0
 docopt==0.6.2
 pdfrw==0.2
+Pillow==3.3.0
+Pint==0.7.2
 pycparser==2.14
 tinycss2==0.5
+voluptuous==0.9.3
 webencodings==0.5

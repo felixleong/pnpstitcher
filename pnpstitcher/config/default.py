@@ -12,5 +12,8 @@ DEFAULT_CONFIG = {
         'layer': 'top',
         'dashed': 'true',
         'trim_offset': '0mm',
+    },
+    'svg': {
+        'page_dpi': '96',
     }
 }
