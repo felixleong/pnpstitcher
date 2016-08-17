@@ -40,7 +40,8 @@ class BaseGenerator(object):
         :param bool rtl: Layout the images from right-to-left.
         """
         self._generate_cut_line(
-            image_catalog.image_size, cutline_config['trim_offset'])
+            image_catalog.image_size,
+            (cutline_config['trim_offset_x'], cutline_config['trim_offset_y']))
 
         # Start the rendering
         image_width = image_catalog.image_size[0] / self.image_dpi
@@ -121,17 +122,18 @@ class BaseGenerator(object):
         """
         raise NotImplemented()
 
-    def _generate_cut_line(self, image_dimension, trim_offset=0):
+    def _generate_cut_line(self, image_dimension, trim_offset=(0, 0)):
         """
         Generate the page frame meta.
 
         :param tuple image_dimension: A 2-tuple containing the width and height
             of the card images in inches.
-        :param int trim_offset: The trim offset in inches.
+        :param int trim_offset: The trim offset in inches in a (x, y) list.
         :returns: The metadata of the page.
         """
         image_width = image_dimension[0] / self.image_dpi
         image_height = image_dimension[1] / self.image_dpi
+        trim_x, trim_y = trim_offset
         self._card_num_x, self._cut_margin_x = divmod(
             round(self.page_width - self.page_margin_x * 2), image_width)
         self._card_num_y, self._cut_margin_y = divmod(
@@ -147,15 +149,15 @@ class BaseGenerator(object):
         # Generate the vertical cutlines
         cutline_set = []
         prev_x = self._cut_margin_x
-        if not trim_offset:
+        if not trim_x:
             # If it's a clean cut, we need to draw the left-most cut line
             cutline_set.append(CutLine(prev_x, 0, prev_x, self.page_height))
 
         for cnt in range(self._card_num_x):
             next_x = prev_x + image_width
-            if trim_offset:
-                left_cut = prev_x + trim_offset
-                right_cut = next_x - trim_offset
+            if trim_x:
+                left_cut = prev_x + trim_x
+                right_cut = next_x - trim_x
                 cutline_set.append(CutLine(
                     left_cut, 0, left_cut, self.page_height))
                 cutline_set.append(CutLine(
@@ -168,15 +170,15 @@ class BaseGenerator(object):
 
         # Generate the horizontal cutlines
         prev_y = self._cut_margin_y
-        if not trim_offset:
+        if not trim_y:
             # If it's a clean cut, we need to draw the top-most cut line
             cutline_set.append(CutLine(0, prev_y, self.page_width, prev_y))
 
         for cnt in range(self._card_num_y):
             next_y = prev_y + image_height
-            if trim_offset:
-                top_cut = prev_y + trim_offset
-                bottom_cut = next_y - trim_offset
+            if trim_y:
+                top_cut = prev_y + trim_y
+                bottom_cut = next_y - trim_y
                 cutline_set.append(CutLine(
                     0, top_cut, self.page_width, top_cut))
                 cutline_set.append(CutLine(
