@@ -1,4 +1,5 @@
 from pnpstitcher.generator.base import BaseGenerator
+from tinycss2.color3 import parse_color
 import cairocffi as cairo
 
 
@@ -64,7 +65,7 @@ class PdfGenerator(BaseGenerator):
         :param dict cutline_config: The cutline configuration.
         """
         # Set the style
-        self._context.set_source_rgba(*cutline_config['color_float'])
+        self._context.set_source_rgba(*parse_color(cutline_config['color']))
         self._context.set_line_width(cutline_config['width'])
         if cutline_config['dashed']:
             self._context.set_dash((4, 4), 0)

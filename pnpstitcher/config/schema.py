@@ -6,7 +6,7 @@ from voluptuous import (
     Required,
     Schema,
     REMOVE_EXTRA)
-from pnpstitcher.config.validator import inches, csscolor
+from pnpstitcher.validators import inches, csscolor
 
 
 _PAGE_SCHEMA = Schema({

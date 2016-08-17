@@ -1,3 +1,4 @@
+import os.path
 from pint import UnitRegistry
 from tinycss2.color3 import parse_color
 from voluptuous import Invalid
@@ -31,3 +32,17 @@ def csscolor(value):
         raise Invalid('Invalid CSS color specified')
 
     return value
+
+
+def file_exists(value):
+    """
+    Validate the file name one whether it exists or otherwise.
+
+    :param str value: The data value as file name.
+    :returns: The original value.
+    :rtype: str
+    """
+    if os.path.exists(value) and os.path.isfile(value):
+        return value
+    else:
+        raise Invalid('Invalid file')

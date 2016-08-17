@@ -8,12 +8,13 @@ DEFAULT_CONFIG = {
     },
     'cutline': {
         'color': '#aaaaaa',
-        'width': '0.5',
+        'width': '0.5pp',
         'layer': 'top',
         'dashed': 'true',
-        'trim_offset': '0mm',
+        'trim_offset_x': '0mm',
+        'trim_offset_y': '0mm',
     },
     'svg': {
         'page_dpi': '96',
-    }
+    },
 }
