@@ -25,6 +25,7 @@ from voluptuous import (
     Any,
     Optional,
     Schema)
+import os.path
 
 
 __OPT_SCHEMA = Schema({
@@ -34,6 +35,25 @@ __OPT_SCHEMA = Schema({
     Optional('--rtl', default=False): bool,
     '<files>': [file_exists],
 })
+__DEFAULT_CONFIG_PATH = [
+    '$HOME/.config/pnpstitch.ini',
+    './pnpstitch.ini',
+]
+
+
+def __load_default_config():
+    for fn in __DEFAULT_CONFIG_PATH:
+        full_fn = os.path.expandvars(fn)
+        if os.path.isfile(full_fn):
+            parser = ConfigParser()
+            parser.read(full_fn)
+            return CONFIG_SCHEMA(parser.as_dict())
+
+    # If none of the config works out, we would just load our in app default
+    # config
+    parser = ConfigParser()
+    config = CONFIG_SCHEMA(DEFAULT_CONFIG)
+    return config
 
 
 if __name__ == '__main__':
@@ -47,12 +67,12 @@ if __name__ == '__main__':
     filename_set = arguments['<files>']
 
     # Load the configuration file
-    parser = ConfigParser()
     if config_fn:
+        parser = ConfigParser()
         parser.read(config_fn)
         config = CONFIG_SCHEMA(parser.as_dict())
     else:
-        config = CONFIG_SCHEMA(DEFAULT_CONFIG)
+        config = __load_default_config()
 
     # Setup the generators
     if file_format == 'pdf':

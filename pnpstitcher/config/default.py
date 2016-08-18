@@ -9,9 +9,9 @@ DEFAULT_CONFIG = {
     },
     'cutline': {
         'color': '#999999',
-        'width': '0.75pp',
+        'width': '0.25pp',
         'layer': 'top',
-        'dashed': 'true',
+        'dashed': 'false',
         'trim_offset_x': '0mm',
         'trim_offset_y': '0mm',
         'round_corner': '4mm',
