@@ -5,6 +5,7 @@ DEFAULT_CONFIG = {
         'height': '297mm',
         'margin_x': '3mm',
         'margin_y': '3mm',
+        'mode': 'full',
     },
     'cutline': {
         'color': '#999999',

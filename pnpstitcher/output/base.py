@@ -53,8 +53,9 @@ class BaseGenerator(object):
                         self.cutline_generator.cutline_set, cutline_config)
 
             # Draw the image
-            self._draw_image(
-                pil_image, x_pos, y_pos, (image_width, image_height))
+            if self.page_config['mode'] in ('full', 'image'):
+                self._draw_image(
+                    pil_image, x_pos, y_pos, (image_width, image_height))
 
             # Switch to next row when it is happening
             x_cnt = x_cnt + 1
@@ -115,6 +116,11 @@ class BaseGenerator(object):
         :param list cutline_set: The list of cutlines.
         :param dict cutline_config: The cutline configuration.
         """
+        # If it's image mode, we would skip this
+        if not self.page_config['mode'] in ('full', 'cutline'):
+            return
+
+        # Decide which style of cutline to draw
         if cutline_config['style'] == 'cutthrough':
             self._draw_cutlines_cutthrough(cutline_set, cutline_config)
         elif cutline_config['style'] == 'inset':

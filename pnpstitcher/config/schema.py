@@ -16,6 +16,7 @@ _PAGE_SCHEMA = Schema({
     Required('height', default=inches('297mm')): All(str, inches),
     Required('margin_x', default=inches('3mm')): All(str, inches),
     Required('margin_y', default=inches('3mm')): All(str, inches),
+    Required('mode', default='full'): Any('full', 'cutline', 'image'),
 }, extra=REMOVE_EXTRA)
 
 _CUTLINE_SCHEMA = Schema({
