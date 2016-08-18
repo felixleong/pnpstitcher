@@ -106,7 +106,7 @@ class PdfGenerator(BaseGenerator):
         """
         # Set the style
         self._context.set_source_rgba(*parse_color(cutline_config['color']))
-        self._context.set_line_width(cutline_config['width'])
+        self._context.set_line_width(cutline_config['width'] * self.page_dpi)
         if cutline_config['dashed']:
             self._context.set_dash((4, 4), 0)
 
