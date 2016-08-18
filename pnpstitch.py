@@ -18,10 +18,10 @@ from pnpstitcher.config import (
     CONFIG_SCHEMA,
     DEFAULT_CONFIG)
 from pnpstitcher.image import ImageCatalog
-from pnpstitcher.generator import PdfGenerator, SvgGenerator
+from pnpstitcher.cutline import CutlineGenerator
+from pnpstitcher.output import PdfGenerator, SvgGenerator
 from pnpstitcher.validators import file_exists
 from voluptuous import (
-    All,
     Any,
     Optional,
     Schema)
@@ -54,19 +54,21 @@ if __name__ == '__main__':
     else:
         config = CONFIG_SCHEMA(DEFAULT_CONFIG)
 
-    # Handle the files now
-    image_catalog = ImageCatalog(filename_set)
+    # Setup the generators
     if file_format == 'pdf':
-        output_generator = PdfGenerator(
-            output_fn, config['page']['width'], config['page']['height'],
-            config['page']['margin_x'], config['page']['margin_y'],
-            config['page']['dpi'], 72)
+        OutputGenerator = PdfGenerator
+        page_dpi = 72
     elif file_format == 'svg':
-        output_generator = SvgGenerator(
-            output_fn, config['page']['width'], config['page']['height'],
-            config['page']['margin_x'], config['page']['margin_y'],
-            config['page']['dpi'], 96)
+        OutputGenerator = SvgGenerator
+        page_dpi = config['svg']['page_dpi']
     else:
         raise RuntimeError('Unsupported output file format')
+
+    # Output the file
+    image_catalog = ImageCatalog(filename_set)
+    cutline_generator = CutlineGenerator(config['page'], config['cutline'])
+    cutline_generator.generate(image_catalog)
+    output_generator = OutputGenerator(
+        output_fn, cutline_generator, config['page'], page_dpi)
 
     output_generator.generate(image_catalog, config['cutline'], rtl)

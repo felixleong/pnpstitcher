@@ -7,12 +7,14 @@ DEFAULT_CONFIG = {
         'margin_y': '3mm',
     },
     'cutline': {
-        'color': '#aaaaaa',
-        'width': '0.5pp',
+        'color': '#999999',
+        'width': '0.75pp',
         'layer': 'top',
         'dashed': 'true',
         'trim_offset_x': '0mm',
         'trim_offset_y': '0mm',
+        'round_corner': '4mm',
+        'style': 'cutthrough',
     },
     'svg': {
         'page_dpi': '96',
