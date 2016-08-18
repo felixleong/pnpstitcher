@@ -91,4 +91,5 @@ if __name__ == '__main__':
     output_generator = OutputGenerator(
         output_fn, cutline_generator, config['page'], page_dpi)
 
-    output_generator.generate(image_catalog, config['cutline'], rtl)
+    output_generator.generate(
+        image_catalog, config['cutline'], config['registration'], rtl)

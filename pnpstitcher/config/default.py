@@ -4,8 +4,9 @@ DEFAULT_CONFIG = {
         'width': '210mm',
         'height': '297mm',
         'margin_x': '3mm',
-        'margin_y': '3mm',
+        'margin_y': '10mm',
         'mode': 'full',
+        'registration': 'false',
     },
     'cutline': {
         'color': '#999999',
@@ -19,5 +20,11 @@ DEFAULT_CONFIG = {
     },
     'svg': {
         'page_dpi': '96',
+    },
+    'registration': {
+        'type': 'square',
+        'x_pos': '0mm',
+        'y_pos': '0mm',
+        'size': '10mm',
     },
 }

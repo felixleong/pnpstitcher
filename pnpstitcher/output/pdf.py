@@ -139,3 +139,54 @@ class PdfGenerator(BaseGenerator):
             round_corner * self.page_dpi,
             math.radians(90), math.radians(180))
         self._context.close_path()
+
+    def _draw_registration_crosshair(self, registration_config):
+        """
+        Draw a crosshair registration mark.
+
+        :param dict registration_config: The registration mark configuration.
+        """
+        size = registration_config['size']
+        half_size = registration_config['size'] / 2
+        circle_size = registration_config['size'] * 0.35
+
+        self._context.save()
+        self._context.set_source_rgba(0, 0, 0, 1)
+        self._context.set_line_width(1)
+        self._context.move_to(
+            (registration_config['x_pos'] + half_size) * self.page_dpi,
+            registration_config['y_pos'] * self.page_dpi)
+        self._context.line_to(
+            (registration_config['x_pos'] + half_size) * self.page_dpi,
+            (registration_config['y_pos'] + size) * self.page_dpi)
+
+        self._context.move_to(
+            registration_config['x_pos'] * self.page_dpi,
+            (registration_config['y_pos'] + half_size) * self.page_dpi)
+        self._context.line_to(
+            (registration_config['x_pos'] + size) * self.page_dpi,
+            (registration_config['y_pos'] + half_size) * self.page_dpi)
+
+        self._context.arc(
+            (registration_config['x_pos'] + half_size) * self.page_dpi,
+            (registration_config['y_pos'] + (size * 0.5)) * self.page_dpi,
+            circle_size * self.page_dpi,
+            math.radians(0), math.radians(360))
+        self._context.stroke()
+        self._context.restore()
+
+    def _draw_registration_square(self, registration_config):
+        """
+        Draw a square registration mark.
+
+        :param dict registration_config: The registration mark configuration.
+        """
+        self._context.save()
+        self._context.set_source_rgba(0, 0, 0, 1)
+        self._context.rectangle(
+            registration_config['x_pos'] * self.page_dpi,
+            registration_config['y_pos'] * self.page_dpi,
+            registration_config['size'] * self.page_dpi,
+            registration_config['size'] * self.page_dpi)
+        self._context.fill()
+        self._context.restore()

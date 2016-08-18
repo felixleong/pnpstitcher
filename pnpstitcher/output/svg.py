@@ -24,6 +24,18 @@ class SvgGenerator(BaseGenerator):
             stroke-opacity: 1;
             stroke-dasharray: 6, 6;
         }}
+        .reg_square {{
+            fill: #000000,
+            stroke: none
+        }}
+        .reg_crosshair {{
+            fill: none;
+            stroke: #000000;
+            stroke-width: 2;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+            stroke-opacity: 1;
+        }}
     """
 
     def __init__(self, filename, cutline_generator, page_config, page_dpi):
@@ -134,3 +146,46 @@ class SvgGenerator(BaseGenerator):
                     (line.y1 - line.y0) * self.page_dpi),
                 ry=(cutline_config['round_corner'] * self.page_dpi),
                 class_=class_name))
+
+    def _draw_registration_crosshair(self, registration_config):
+        """
+        Draw a crosshair registration mark.
+
+        :param dict registration_config: The registration mark configuration.
+        """
+        x_pos = registration_config['x_pos']
+        y_pos = registration_config['y_pos']
+        half_size = registration_config['size'] / 2
+        size = registration_config['size']
+
+        self._drawing.add(
+            self._drawing.line(
+                ((x_pos + half_size) * self.page_dpi, y_pos * self.page_dpi),
+                ((x_pos + half_size) * self.page_dpi,
+                    (y_pos + size) * self.page_dpi),
+                class_='reg_crosshair'))
+        self._drawing.add(
+            self._drawing.line(
+                (x_pos * self.page_dpi, (y_pos + half_size) * self.page_dpi),
+                ((x_pos + size) * self.page_dpi,
+                    (y_pos + half_size) * self.page_dpi),
+                class_='reg_crosshair'))
+        self._drawing.add(
+            self._drawing.circle(
+                ((x_pos + half_size) * self.page_dpi,
+                    (y_pos + half_size) * self.page_dpi),
+                r=size * 0.35 * self.page_dpi,
+                class_='reg_crosshair'))
+
+    def _draw_registration_square(self, registration_config):
+        """
+        Draw a square registration mark.
+
+        :param dict registration_config: The registration mark configuration.
+        """
+        self._drawing.add(self._drawing.rect(
+            (registration_config['x_pos'] * self.page_dpi,
+                registration_config['y_pos'] * self.page_dpi),
+            (registration_config['size'] * self.page_dpi,
+                registration_config['size'] * self.page_dpi),
+            class_='reg_square'))

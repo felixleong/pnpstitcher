@@ -17,6 +17,7 @@ _PAGE_SCHEMA = Schema({
     Required('margin_x', default=inches('3mm')): All(str, inches),
     Required('margin_y', default=inches('3mm')): All(str, inches),
     Required('mode', default='full'): Any('full', 'cutline', 'image'),
+    Optional('registration', default=False): Boolean,
 }, extra=REMOVE_EXTRA)
 
 _CUTLINE_SCHEMA = Schema({
@@ -35,8 +36,17 @@ _SVG_SCHEMA = Schema({
     Required('page_dpi', default=96): Coerce(int),
 }, extra=REMOVE_EXTRA)
 
+_REGISTRATION_SCHEMA = Schema({
+    Required('type', default='crosshair'): Any('crosshair', 'square'),
+    Required('x_pos', default='0mm'): All(str, inches),
+    Required('y_pos', default='0mm'): All(str, inches),
+    Required('size', default='10mm'): All(str, inches),
+})
+
 CONFIG_SCHEMA = Schema({
     'page': _PAGE_SCHEMA,
     Optional('cutline', default=_CUTLINE_SCHEMA({})): _CUTLINE_SCHEMA,
     Optional('svg', default=_SVG_SCHEMA({})): _SVG_SCHEMA,
+    Optional('registration', default=_REGISTRATION_SCHEMA({})): (
+        _REGISTRATION_SCHEMA),
 }, extra=REMOVE_EXTRA)
