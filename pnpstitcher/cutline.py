@@ -34,14 +34,10 @@ class CutlineGenerator(object):
 
         # Get the page meta
         card_num_x, cut_margin_x = divmod(
-            round(
-                self._page_config['width'] -
-                self._page_config['margin_x'] * 2),
+            self._page_config['width'] - self._page_config['margin_x'] * 2,
             self._image_width)
         card_num_y, cut_margin_y = divmod(
-            round(
-                self._page_config['height'] -
-                self._page_config['margin_y'] * 2),
+            self._page_config['height'] - self._page_config['margin_y'] * 2,
             self._image_height)
 
         self.card_num_x = int(card_num_x)
