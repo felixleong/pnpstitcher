@@ -1,4 +1,4 @@
-# pnpstitch 0.1
+# pnpstitch - Python script to assemble PNP images into printable sheets
 
 PNPStitch is a set of tools to stitch a group of PNG files that have the same
 dimension into sheets of pages together with cut lines.
