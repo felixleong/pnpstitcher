@@ -4,13 +4,27 @@ DEFAULT_CONFIG = {
         'width': '210mm',
         'height': '297mm',
         'margin_x': '3mm',
-        'margin_y': '3mm',
+        'margin_y': '10mm',
+        'mode': 'full',
+        'registration': 'false',
     },
     'cutline': {
-        'color': '#aaaaaa',
-        'width': '0.5',
+        'color': '#999999',
+        'width': '0.25pp',
         'layer': 'top',
-        'dashed': 'true',
-        'trim_offset': '0mm',
-    }
+        'dashed': 'false',
+        'trim_offset_x': '0mm',
+        'trim_offset_y': '0mm',
+        'round_corner': '4mm',
+        'style': 'cutthrough',
+    },
+    'svg': {
+        'page_dpi': '96',
+    },
+    'registration': {
+        'type': 'square',
+        'x_pos': '0mm',
+        'y_pos': '0mm',
+        'size': '10mm',
+    },
 }

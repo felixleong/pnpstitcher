@@ -1,60 +1,23 @@
-from copy import deepcopy
-from pint import UnitRegistry
-from pnpstitcher.config.default import DEFAULT_CONFIG
-from tinycss2.color3 import parse_color
 import configparser
 
 
-def load_config(config_filename=None):
+class ConfigParser(configparser.ConfigParser):
     """
-    Load the configuration file.
+    ConfigParser implementation that can output as dict.
 
-    :param str config_filename: The configuration filename.
-    :returns: The parsed and validated configuration.
-    :rtype: dict
+    Credit: Alex Martelli, http://stackoverflow.com/a/3220891
     """
-    config = deepcopy(DEFAULT_CONFIG)
 
-    if config_filename:
-        parser = configparser.ConfigParser()
-        parser.read(config_filename)
+    def as_dict(self):
+        """
+        Return a dictionary of the parsed config.
 
-        for key in config.keys():
-            if key in parser:
-                config[key].update(parser[key])
+        :returns: The dictionary of the parsed config.
+        :rtype: dict
+        """
+        d = dict(self._sections)
 
-    __normalize(config)
-
-    return config
-
-
-def __normalize(config):
-    """
-    Normalize the config parameters.
-
-    :param dict config: The configuration dictionary.
-    """
-    ureg = UnitRegistry()
-    Q_ = ureg.Quantity
-
-    # Convert all the page related parameter to pixels
-    dpi = int(config['page']['dpi'])
-    config['page']['dpi'] = dpi
-    config['page']['width'] = round(
-        Q_(config['page']['width']).m_as('in') * dpi)
-    config['page']['height'] = round(
-        Q_(config['page']['height']).m_as('in') * dpi)
-    config['page']['margin_x'] = round(
-        Q_(config['page']['margin_x']).m_as('in') * dpi)
-    config['page']['margin_y'] = round(
-        Q_(config['page']['margin_y']).m_as('in') * dpi)
-
-    # Convert the cutline configuration
-    config['cutline']['color'] = parse_color(config['cutline']['color'])
-    config['cutline']['width'] = float(config['cutline']['width'])
-    config['cutline']['dashed'] = config['cutline']['dashed'] == 'true'
-    config['cutline']['trim_offset'] = round(
-        Q_(config['cutline']['trim_offset']).m_as('in') * dpi)
-    if config['cutline']['layer'] not in ('top', 'bottom'):
-        raise ValueError(
-            'Cutline layer config takes either "top" or "bottom".')
+        for k in d:
+            d[k] = dict(self._defaults, **d[k])
+            d[k].pop('__name__', None)
+        return d
